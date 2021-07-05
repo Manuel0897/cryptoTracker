@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, Pressable, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
 import Http from '../../libs/http';
 import colors from '../../res/colors';
 import CoinsItem from './CoinsItem';

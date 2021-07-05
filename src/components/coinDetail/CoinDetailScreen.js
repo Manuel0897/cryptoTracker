@@ -4,14 +4,17 @@ import {
   Image,
   Text,
   SectionList,
-  StyleSheet
+  FlatList,
+  StyleSheet,
 } from 'react-native';
 import colors from '../../res/colors';
+import CoinMarketsDetails from './CoinMarketsDetails';
 
 class CoinDetailScreen extends Component {
 
   state = {
-    coin: {}
+    coin: {},
+    markets: []
   }
 
   getSymbolIcon = (name) => {
@@ -22,7 +25,6 @@ class CoinDetailScreen extends Component {
   }
 
   getSections = (coin) => {
-
     const sections = [
       {
         title: "Market cap",
@@ -41,15 +43,24 @@ class CoinDetailScreen extends Component {
     return sections;
   }
 
+  getMarkets = async (coinId) => {
+    const url = `https://api.coinlore.net/api/coin/markets/?id=${coinId}`
+
+    const markets = await Http.instance.get(url);
+    this.setState({ markets });
+  }
+
   componentDidMount() {
     const { coin } = this.props.route.params;
 
     this.props.navigation.setOptions({ title: coin.symbol });
+    this.getMarkets(coin.id);
     this.setState({ coin });
   }
 
   render() {
-    const { coin } = this.state;
+
+    const { coin, markets } = this.state;
 
     return (
       <View style={styles.container}>
@@ -59,6 +70,7 @@ class CoinDetailScreen extends Component {
             <Text style={styles.titleText}>{coin.name}</Text>
           </View>
         </View>
+
         <SectionList
           style={styles.section}
           sections={this.getSections(coin)}
@@ -73,6 +85,14 @@ class CoinDetailScreen extends Component {
               <Text style={styles.sectionText}>{section.title}</Text>
             </View>
             }
+        />
+
+        <Text style={styles.marketsTitle}>Markets</Text>
+        <FlatList
+          style={styles.list}
+          horizontal={true}
+          data={markets}
+          renderItem={({ item }) => <CoinMarketsDetails item={item} />}
         />
       </View>
     );
@@ -125,6 +145,13 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontSize: 14,
     fontWeight: "bold"
+  },
+  marketsTitle: {
+    color: colors.white,
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 16,
+    marginLeft: 16
   }
 });
 
