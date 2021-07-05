@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import colors from '../../res/colors';
 import CoinMarketsDetails from './CoinMarketsDetails';
+import Http from '../../libs/http';
 
 class CoinDetailScreen extends Component {
 

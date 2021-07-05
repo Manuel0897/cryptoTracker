@@ -3,25 +3,22 @@ import { View, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
 import Http from '../../libs/http';
 import colors from '../../res/colors';
 import CoinsItem from './CoinsItem';
+import CoinsSearch from './CoinsSearch';
 
-
-export default class CoinsScreen extends Component {
-
+class CoinsScreen extends Component {
     state = {
         coins: [],
         allCoins: [],
         loading: false
     }
-    
+
     componentDidMount = () => {
         this.getCoins();
     }
-    
+
     getCoins = async () => {
         this.setState({ loading: true });
-    
         const res = await Http.instance.get("https://api.coinlore.net/api/tickers/");
-    
         this.setState({ coins: res.data, allCoins: res.data, loading: false });
     }
 
@@ -29,12 +26,24 @@ export default class CoinsScreen extends Component {
         this.props.navigation.navigate('CoinDetail', { coin });
     }
 
+    handleSearch = (query) => {
+        const { allCoins } = this.state;
+
+        const coinsFiltered = allCoins.filter((coin) =>
+            coin.name.toLowerCase().includes(query.toLowerCase()) ||
+            coin.symbol.toLowerCase().includes(query.toLowerCase())
+        );
+
+        this.setState({ coins: coinsFiltered });
+    }
+
     render() {
         const { coins, loading } = this.state;
 
         return (
-            <View style={ styles.container }>
-                { loading ?
+            <View style={styles.container}>
+                <CoinsSearch onChange={this.handleSearch} />
+                    { loading ?
                     <ActivityIndicator
                         style={styles.loader}
                         color="#fff"
@@ -42,15 +51,15 @@ export default class CoinsScreen extends Component {
 
                     />
                     : null
-                }
-                <FlatList
+                    }
+                    <FlatList
                     data={coins}
-                    renderItem={({item}) => (
+                    renderItem={({ item }) =>
                         <CoinsItem item={item} onPress={() => this.handlePress(item)} />
-                    )}
+                    }
                 />
             </View>
-        )
+        );
     }
 }
 
@@ -60,10 +69,12 @@ const styles = StyleSheet.create({
         backgroundColor: colors.charade
     },
     titleText: {
-        color: "#222",
+        color: "#fff",
         textAlign: "center"
     },
     loader: {
-      marginTop: 60
+        marginTop: 60
     }
-})
+});
+
+export default CoinsScreen;
